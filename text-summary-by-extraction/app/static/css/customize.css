@@ -1,0 +1,86 @@
+.header-navbar.fixed-top {
+    left: 0;
+}
+
+.navbar-sticky.navbar-scrolled:not(.horizontal-layout) .header-navbar {
+    background-color: #FFF;
+}
+
+.navbar-container.content {
+    padding-left: 1.8rem;
+    padding-right: 1.2rem;
+}
+
+.navbar-nav {
+    display: -ms-flexbox;
+    display: flex;
+    -ms-flex-direction: column;
+    flex-direction: row;
+}
+
+.content {
+    padding: 0;
+    position: relative;
+    -webkit-transition: .3s ease all;
+    transition: .3s ease all;
+    backface-visibility: hidden;
+    min-height: calc(100% - 3.5rem);
+}
+
+.content.app-content {
+    overflow: hidden;
+}
+
+.app-content .content-wrapper {
+    padding: 1.8rem 2.2rem 0;
+    margin-top: 3rem;
+    min-height: calc(100vh - 7rem);
+}
+
+.position-relative .form-control {
+    padding-right: 6rem;
+}
+
+button.search-button {
+    width: 5rem;
+    right: 8px;
+    top: 5px;
+}
+
+footer.footer {
+    padding: 1rem 2.2rem;
+}
+
+.content-80 {
+    width: 80%;
+    margin: 1rem auto;
+}
+
+.news-table {
+    font-size: 14px;
+}
+
+.detail {
+    width: 80%;
+    margin: 1rem auto;
+}
+
+.detail .title {
+    margin: 2.3rem 0 1.5rem 0;
+}
+
+.nav-divider {
+    margin: auto 0.8rem;
+}
+
+.nav-text {
+    margin: auto;
+}
+
+.action-buttons {
+    float: right;
+}
+
+.action-buttons > button {
+    margin: auto 0.5rem;
+}
