@@ -1,0 +1,104 @@
+﻿{% extends "layout.html" %}
+
+{% block content %}
+<script src="../static/js/jquery.min.js" type="text/javascript" charset='utf-8'></script>
+
+<script type="text/javascript">
+    // 初始化界面
+    $(function () {
+        $('#li_1').attr('class', 'active');
+        $('#li_2').attr('class', '');
+
+        // 判断是否登录
+        $.get('http://127.0.0.1:5000/check_login', {},
+            function (data) {
+                console.log(data);
+                if (data['login'] === false) {
+                    $('#show_login_reg').show();
+                    $('#index_img').css('height', '71%');
+                }
+                else {
+                    $('#login_register').hide();
+                    $('#info_box').attr('class', 'col-lg-12');
+                    $('#info_box').css('font-size', '20px');
+                }
+            }
+        );
+
+        $("#reg_submit").click(function () {
+            const name = $("#name").val();
+            const password = $("#password").val();
+
+            console.log(name);
+            console.log(password);
+
+            if ((name === undefined) || (password === undefined) || (name === '') || (password === '')) {
+                alert('字段不能为空！');
+                return
+            }
+
+            // 获取时间
+            $.get('http://127.0.0.1:5000/register/' + name + '/' + password, {},
+                function (data) {
+                    alert(data['info'])
+                }
+            );
+        });
+
+        $("#login_submit").click(function () {
+            const name = $("#name").val();
+            const password = $("#password").val();
+
+            console.log(name);
+            console.log(password);
+
+            if ((name === undefined) || (password === undefined) || (name === '') || (password === '')) {
+                alert('login_submit字段不能为空！');
+                return
+            }
+
+            // 获取时间
+            $.get('http://127.0.0.1:5000/login/' + name + '/' + password, {},
+                function (data) {
+                    alert(data['info']);
+                    if (data['status'] == 'ok') {
+                        window.location.href = "/"
+                    }
+                }
+            );
+        });
+
+    });
+</script>
+
+<div class="container">
+
+    <div class="jumbotron" id="show_login_reg">
+        <div style="height: 150px;">
+            <div class="row">
+                <div class="col-lg-6" id="info_box">
+                    <h4>影片影评文本情感分析</h4>
+                    <p style="font-size: 18px;">利用网络爬虫技术从豆瓣网站采集电影基本信息和评论信息，对评论进行中文分析、关键词抽取、属性词归属，并利用SnowNLP实现情感分析，并利用echarts进行前端可视化，分析情感与豆瓣评分之间的关系。</p>
+                </div>
+                <div class="col-lg-6" style="font-size: 18px;" id="login_register">
+                    <h4>注册/登录</h4>
+                    <p><span style="font-size: 18px;">用户名：</span><input id="name" style="width: 70%;" type="text"></p>
+                    <p><span style="font-size: 18px;">密&nbsp;&nbsp;&nbsp;码：</span><input id="password" type="password" style="width: 70%;"></p>
+                    <p>
+                        <button class="btn btn-primary" id="reg_submit">注册</button>
+                        <button class="btn btn-primary" id="login_submit">登录</button>
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row" style="">
+        <div class="col-sm-12">
+            <img src="https://ss2.bdstatic.com/70cFvnSh_Q1YnxGkpoWK1HF6hhy/it/u=2270407324,270906232&fm=26&gp=0.jpg"
+                 style="width: 100%; height: 520px;" id="index_img">
+        </div>
+    </div>
+</div>
+
+{% endblock %}

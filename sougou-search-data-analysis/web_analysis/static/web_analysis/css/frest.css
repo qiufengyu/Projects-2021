@@ -1,0 +1,50 @@
+.app-title {
+    color: whitesmoke;
+    font-size: 1.5rem;
+    margin: 0.4rem 0 0.4rem 0.5rem
+}
+
+.app-logo {
+    margin: 0.4rem 0
+}
+
+.app-welcome {
+    color: whitesmoke;
+    font-size: 1rem;
+    margin-right: 0.5rem;
+}
+
+.content-wrapper {
+    padding: 0rem 1rem 0;
+}
+
+.bar-wrapper {
+    margin: 0.5rem 0;
+}
+
+.bar-wrapper .nav.nav-pills {
+    border-bottom-color: transparent;
+}
+
+.bar-wrapper .nav.nav-pills .dropdown-menu {
+    margin: .53rem
+}
+
+.bar-wrapper .nav.nav-pills .nav-item {
+    margin-bottom: .8rem
+}
+
+.bar-wrapper .nav.nav-pills .nav-item .nav-link {
+    display: -webkit-box;
+    display: -webkit-flex;
+    display: -ms-flexbox;
+    display: flex;
+    -webkit-box-align: center;
+    -webkit-align-items: center;
+    -ms-flex-align: center;
+    align-items: center
+}
+
+.bar-wrapper .nav.nav-pills .nav-item .nav-link i {
+    font-size: 1.4rem
+}

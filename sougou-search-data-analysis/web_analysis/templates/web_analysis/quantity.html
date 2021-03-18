@@ -1,0 +1,102 @@
+{% extends "web_analysis/base.html" %}
+
+{% block tab1 %}
+    <li class="nav-item">
+        <a class="nav-link active" role="tab" href="{% url 'quantity' %}" aria-selected="true">
+            <span class="d-sm-block d-none">搜索量分析</span>
+        </a>
+    </li>
+{% endblock %}
+
+{% block content %}
+    <div class="topn-selector">
+        <div class="row">
+            <div class="col-md-8 mb-1">
+                <form action="{% url 'quantity' %}" method="post">
+                    {% csrf_token %}
+                    <div class="input-group">
+                        <input type="text" class="form-control" placeholder="搜索量排名用户数" name="topn">
+                        <div class="input-group-append">
+                            <button class="btn btn-primary" type="submit"> 分析 </button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <div>
+        <h5 style="padding: 0.5rem 1rem">{{ results_title }}</h5>
+    </div>
+    <div class="row">
+        <div class="col-9">
+            <div style="width:1200px; height:700px" id="myChart"></div>
+        </div>
+        <div class="col-3">
+            <div class="table-responsive">
+        <table class="table table-striped mb-0">
+            <thead class="thead-dark">
+            <tr>
+                <th>用户原始 ID </th>
+                <th>搜索次数</th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for result in results %}
+                <tr>
+                    <td class="text-bold-500">{{ result.initialid }}</td>
+                    <td>{{ result.count }}</td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block canvas %}
+    <script>
+        option = {
+            title: {
+                text: '用户搜索排名',
+                left: 'center'
+            },
+            tooltip: {
+                trigger: 'axis',
+                axisPointer: {
+                    type: 'shadow'
+                },
+                formatter: '{b} <br/> {c} 次'
+            },
+            toolbox: {
+                feature: {
+                    dataView: {show: true, readOnly: false},
+                    magicType: {show: true, type: ['line', 'bar']},
+                    restore: {show: true},
+                    saveAsImage: {show: true}
+                }
+            },
+            legend: {
+                data: ['上网搜索次数']
+            },
+            xAxis: {
+                type: 'category',
+                data: {{ user_labels | safe }}
+            },
+            yAxis: {
+                type: 'value'
+            },
+            series: [{
+                data: {{ user_values | safe }},
+                label: {
+                    show: true,
+                    position: 'top'
+                },
+                type: 'bar'
+            }]
+        };
+        const chartDom = document.getElementById('myChart');
+        const myChart = echarts.init(chartDom);
+        option && myChart.setOption(option);
+    </script>
+{% endblock %}

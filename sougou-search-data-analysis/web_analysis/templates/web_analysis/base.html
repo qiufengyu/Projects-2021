@@ -1,0 +1,91 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Web Analysis</title>
+    <link rel="icon" type="image/png" href="{% static 'logo.png' %}"/>
+    <link rel="stylesheet" type="text/css" href="{% static 'web_analysis/css/bootstrap.min.css' %}">
+    <link rel="stylesheet" type="text/css" href="{% static 'web_analysis/css/bootstrap-extended.min.css' %}">
+    <link rel="stylesheet" type="text/css" href="{% static 'web_analysis/css/colors.min.css' %}">
+    <link rel="stylesheet" type="text/css" href="{% static 'web_analysis/css/components.css' %}">
+    <link rel="stylesheet" type="text/css" href="{% static 'web_analysis/css/frest.css' %}">
+    <link rel="stylesheet" type="text/css" href="{% static 'web_analysis/css/style.css' %}">
+</head>
+<body>
+<header class="navbar navbar-expand navbar-dark flex-column flex-md-row bd-navbar">
+    <div class="navbar-nav-scroll">
+        <div class="navbar-nav bd-navbar-nav flex-row">
+            <span class="app-logo"><img src="{% static 'logo.png' %}" height="30px" width="30px"/> </span>
+            <span class="app-title">用户网络行为数据分析系统</span>
+        </div>
+    </div>
+    <div class="navbar-nav flex-row ml-md-auto d-none d-md-flex">
+        {% if user %}
+        <span class="app-welcome">欢迎您, {{ user }}</span>
+        {% endif %}
+    </div>
+</header>
+<div class="content-wrapper">
+    <div class="bar-wrapper">
+        <div class="row">
+            <div class="col-12">
+                <ul class="nav nav-pills" role="tablist">
+                    {% block tab1 %}
+                        <li class="nav-item">
+                            <a class="nav-link" role="tab" href="{% url 'quantity' %}" aria-selected="false">
+                                <span class="d-none d-sm-block">搜索量分析</span>
+                            </a>
+                        </li>
+                    {% endblock %}
+                    {% block tab2 %}
+                        <li class="nav-item">
+                            <a class="nav-link" role="tab" href="{% url 'wordcloud' %}" aria-selected="false">
+                                <span class="d-none d-sm-block">用户搜索关键词分析</span>
+                            </a>
+                        </li>
+                    {% endblock %}
+                    {% block tab3 %}
+                        <li class="nav-item">
+                            <a class="nav-link" role="tab" href="{% url 'usertime' %}" aria-selected="false">
+                                <span class="d-none d-sm-block">用户上网时间分析</span>
+                            </a>
+                        </li>
+                    {% endblock %}
+                    {% block tab4 %}
+                        <li class="nav-item">
+                            <a class="nav-link" role="tab" href="{% url 'userurl' %}" aria-selected="false">
+                                <span class="d-none d-sm-block">用户点击 URL 分析</span>
+                            </a>
+                        </li>
+                    {% endblock %}
+                    {% block tab5 %}
+                            <li class="nav-item">
+                                <a class="nav-link" role="tab" href="{% url 'keyword' %}" aria-selected="false">
+                                    <span class="d-sm-block d-none">被检索关键词统计</span>
+                                </a>
+                            </li>
+                    {% endblock %}
+                    {% block tab6 %}
+                        <li class="nav-item">
+                            <a class="nav-link" role="tab" href="{% url 'logout' %}" aria-selected="false">
+                                <span class="d-sm-block d-none">退出</span>
+                            </a>
+                        </li>
+                    {% endblock %}
+                </ul>
+            </div>
+        </div>
+    </div>
+    <div class="content-container">
+        {% block content %} {% endblock %}
+    </div>
+</div>
+<script src="{% static 'web_analysis/js/vendors.min.js' %}"></script>
+<script src="{% static 'web_analysis/js/echarts.min.js' %}"></script>
+<script src="{% static 'web_analysis/js/echarts-wordcloud.min.js' %}"></script>
+{% block canvas %}
+{% endblock %}
+</body>
+</html>

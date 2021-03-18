@@ -7,3 +7,9 @@
 
 ### 2. [抽取式文本摘要](./text-summary-by-extraction)
 借助 SnowNLP 中实现的 TextRank 算法，提取新闻文本中的摘要和关键词 + Django Web APP
+
+### 3. [豆瓣电影评论情感分析与推荐](./douban-movie-comment-analysis)
+【非本人项目，帮忙调试】通过爬虫获取豆瓣电影的评论，借助 SnowNLP、jieba 分词等工具，分析情感和影评评分，进行推荐 + Flask
+
+### 4. [Sougou 用户搜索数据行为分析](./sougou-search-data-analysis)
+分析用户搜索相关数据：搜索次数、关键词、时间、点击 URL、找搜索关键词的用户 + 简单用户注册登录功能 + Django

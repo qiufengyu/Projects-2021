@@ -1,0 +1,106 @@
+{% extends "web_analysis/base.html" %}
+
+{% block tab3 %}
+    <li class="nav-item">
+        <a class="nav-link active" role="tab" href="{% url 'usertime' %}" aria-selected="true">
+            <span class="d-sm-block d-none">用户上网时间分析</span>
+        </a>
+    </li>
+{% endblock %}
+
+{% block content %}
+    <div class="usertime-selector">
+        <div class="row">
+            <div class="col-md-8 mb-1">
+                <form action="{% url 'usertime' %}" method="post">
+                    {% csrf_token %}
+                    <div class="input-group">
+                        <input type="text" class="form-control" placeholder="用户原始ID (Initial ID)" name="uiid">
+                        <div class="input-group-append">
+                            <button class="btn btn-primary" type="submit"> 用户上网时间分析 </button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <div class="row chart-container">
+        <div clas="col-12">
+            {% if error_message %}
+                <p class="word-cloud-error-message"> {{ error_message }}</p>
+            {% elif time_data and uiid %}
+                <h5 style="padding: 0.5rem 1rem">用户 {{ uiid }} 用户上网时间分析 </h5>
+                <div style="width:1200px; height:600px" id="myChart"></div>
+            {% endif %}
+        </div>
+    </div>
+{% endblock %}
+
+{% block canvas %}
+    <script>
+        option = {
+            title: {
+                text: '用户上网时间',
+                left: 'center'
+            },
+            tooltip: {
+                trigger: 'axis',
+                axisPointer: {
+                    type: 'cross',
+                    crossStyle: {
+                        color: '#999'
+                    }
+                }
+            },
+            toolbox: {
+                feature: {
+                    dataView: {show: true, readOnly: false},
+                    magicType: {show: true, type: ['line', 'bar']},
+                    restore: {show: true},
+                    saveAsImage: {show: true}
+                }
+            },
+            legend: {
+                data: ['上网搜索次数'],
+                orient: 'vertical',
+                right: 10,
+                top: 60
+            },
+            xAxis: [
+                {
+                    type: 'category',
+                    data: ['0点', '1点', '2点', '3点', '4点', '5点', '6点', '7点', '8点', '9点', '10点', '11点',
+                           '12点', '13点', '14点', '15点', '16点', '17点', '18点', '19点', '20点', '21点', '22点', '23点'],
+                    axisPointer: {
+                        type: 'shadow'
+                    }
+                }
+            ],
+            yAxis: [
+                {
+                    type: 'value',
+                    name: '',
+                    interval: 5,
+                    axisLabel: {
+                        formatter: '{value} 次'
+                    }
+                }
+            ],
+            series: [
+                {
+                    name: '上网搜索次数',
+                    type: 'bar',
+                    label: {
+                        show: true,
+                        position: 'top'
+                    },
+                    data: {{ time_data | safe }}
+                }
+            ]
+        };
+        const chartDom = document.getElementById('myChart');
+        const myChart = echarts.init(chartDom);
+        option && myChart.setOption(option);
+    </script>
+{% endblock %}
+

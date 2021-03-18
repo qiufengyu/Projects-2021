@@ -1,0 +1,24 @@
+.word-cloud-error-message {
+    padding: 0.5rem 1rem;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.word-cloud-img {
+    display: block;
+    margin-left: auto;
+    margin-right: auto
+}
+
+.chart-container {
+    margin: 1rem 2rem;
+}
+
+.bg-authentication-body {
+    background: url(../img/auth-bg.jpg) center center no-repeat;
+    background-size: cover;
+}
+
+.bg-authentication {
+    background-color: #F2F4F4;
+}

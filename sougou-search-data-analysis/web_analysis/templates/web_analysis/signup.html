@@ -1,0 +1,78 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Web Analysis</title>
+    <link rel="icon" type="image/png" href="{% static 'logo.png' %}"/>
+    <link rel="stylesheet" type="text/css" href="{% static 'web_analysis/css/bootstrap.min.css' %}">
+    <link rel="stylesheet" type="text/css" href="{% static 'web_analysis/css/bootstrap-extended.min.css' %}">
+    <link rel="stylesheet" type="text/css" href="{% static 'web_analysis/css/colors.min.css' %}">
+    <link rel="stylesheet" type="text/css" href="{% static 'web_analysis/css/components.css' %}">
+    <link rel="stylesheet" type="text/css" href="{% static 'web_analysis/css/frest.css' %}">
+    <link rel="stylesheet" type="text/css" href="{% static 'web_analysis/css/style.css' %}">
+</head>
+<body class="bg-authentication-body blank-page">
+
+<div class="app-content content">
+    <div class="content-wrapper">
+        <div class="content-body">
+<section class="row flexbox-container">
+    <div class="col-xl-8 col-10">
+        <div class="card bg-authentication mb-0">
+            <div class="row m-0">
+                <!-- register section left -->
+                <div class="col-md-6 col-12 px-0">
+                    <div class="card disable-rounded-right mb-0 p-2 h-100 d-flex justify-content-center">
+                        <div class="card-header pb-1">
+                            <div class="card-title">
+                                <h4 class="text-center mb-2">用户网络行为数据分析系统</h4>
+                            </div>
+                        </div>
+                        {% if register_fail %}
+                        <div class="text-center">
+                            <p> 注册失败，用户名已被占用或两次密码不一致！</p>
+                        </div>
+                        {% endif %}
+                        <div class="card-body">
+                            <form action="{% url 'signup' %}" method="post">
+                                {% csrf_token %}
+                                <div class="form-group mb-1">
+                                    <label class="text-bold-600" for="exampleUsername">用户名</label>
+                                    <input type="text" class="form-control" id="exampleUsername" name="usernameInput"
+                                        placeholder="Username">
+                                </div>
+                                <div class="form-group mb-1">
+                                    <label class="text-bold-600" for="examplePassword1">密码</label>
+                                    <input type="password" class="form-control" id="examplePassword1" name="passwordInput1"
+                                        placeholder="Password">
+                                </div>
+                                <div class="form-group mb-2">
+                                    <label class="text-bold-600" for="examplePassword2">确认密码</label>
+                                    <input type="password" class="form-control" id="examplePassword2" name="passwordInput2"
+                                        placeholder="Password">
+                                </div>
+                                <button type="submit" class="btn btn-primary glow position-relative w-100">注册<i id="icon-arrow" class="bx bx-right-arrow-alt"></i></button>
+                            </form>
+                            <hr>
+                            <div class="text-center"><small class="mr-25">已有账号?</small><a href="{% url 'login' %}"><small>登录</small> </a></div>
+                        </div>
+                    </div>
+                </div>
+                <!-- image section right -->
+                <div class="col-md-6 d-md-block d-none text-center align-self-center p-3">
+                    <img class="img-fluid" src="{% static 'web_analysis/img/register.png' %}" alt="branding logo">
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+        </div>
+    </div>
+</div>
+
+
+<script src="{% static 'web_analysis/js/vendors.min.js' %}"></script>
+</body>
+</html>

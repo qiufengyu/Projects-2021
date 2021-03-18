@@ -1,0 +1,239 @@
+{% extends "layout.html" %}
+
+{% block content %}
+<script src="../static/js/jquery.min.js" type="text/javascript" charset='utf-8'></script>
+<script src="https://cdn.bootcss.com/echarts/4.4.0-rc.1/echarts.js" charset='utf-8'></script>
+<script src="../static/js/echarts-wordcloud.min.js" type="text/javascript" charset='utf-8'></script>
+
+<script>
+    $(function () {
+        $('#li_1').attr('class', '');
+        $('#li_2').attr('class', 'active');
+
+        $('#submit').click(function () {
+            var name = $('#name').val();
+            $('#name').val(decodeURIComponent(name));
+            $('#电影名称').text('');
+            $('#豆瓣评分').text('');
+            $('#电影标签').text('');
+            $('#电影演员').text('');
+            $('#预测情感评分').text('');
+            $('#电影简介').text('');
+            $('#电影海报').empty();
+            $('#echarts_content0').empty();
+            $('#echarts_content').empty();
+            $('#info').text('正在抓取数据并分析，请勿离开页面。。。');
+            $('#submit').attr("disabled", true);
+            // 获取时间
+            $.get('http://127.0.0.1:5000/movie_search/' + name, {},
+                function (data) {
+                    $('#submit').attr("disabled", false);
+                    $('#info').text('');
+                    $('#电影名称').text(data['电影名称']);
+                    $('#豆瓣评分').text('豆瓣评分：' + data['豆瓣评分']);
+                    $('#预测情感评分').text('预测的加权情感得分：' + data['预测情感评分']);
+                    $('#电影标签').text(data['电影标签']);
+                    $('#电影演员').text(data['电影演员']);
+                    $('#电影简介').text(data['电影简介']);
+                    $('#电影海报').append('<img rel="v:image" style="width: 100%; height: 300px;" src="' + data['电影海报'] + '"/>');
+                    $('#echarts_content').append('<div class="col-xs-6 placeholder" style="height:550px;" id="main1"></div>\n' +
+                        '        <div class="col-xs-6 placeholder" style="height:550px;" id="main2"></div>');
+                    $('#echarts_content0').append('<div class="col-xs-12 placeholder" style="height:400px;" id="main0"></div>')
+
+                    var dom = document.getElementById("main0");
+                    var myChart = echarts.init(dom);
+
+                    var salary = [];
+                    for (var i = 0; i < data['评分'].length; i++)
+                        salary.push([i, data['评分'][i].toFixed(2)])
+
+                    var option = {
+                        backgroundColor: '#F9F9F9',
+                        title: {
+                            left: 'center',
+                            text: name + ' TOP' + data['属性词'].length + ' 情感属性词词频统计分布',
+                        },
+                        tooltip: {
+                            trigger: 'axis',
+                            axisPointer: {            // 坐标轴指示器，坐标轴触发有效
+                                type: 'shadow'        // 默认为直线，可选为：'line' | 'shadow'
+                            }
+                        },
+                        grid: {
+                            left: '3%',
+                            right: '4%',
+                            bottom: '3%',
+                            containLabel: true
+                        },
+                        xAxis: [
+                            {
+                                type: 'category',
+                                data: data['属性词'],
+                                axisTick: {
+                                    alignWithLabel: true
+                                }
+                            }
+                        ],
+                        yAxis: [
+                            {
+                                type: 'value'
+                            }
+                        ],
+                        series: [
+                            {
+                                name: '直接访问',
+                                type: 'bar',
+                                barWidth: '60%',
+                                data: data['属性词次数']
+                            }
+                        ]
+                    };
+
+                    if (option && typeof option === "object") {
+                        myChart.setOption(option, true);
+                    }
+
+                    var dom = document.getElementById("main1");
+                    var myChart = echarts.init(dom);
+
+                    var salary = [];
+                    for (var i = 0; i < data['评分'].length; i++)
+                        salary.push([i, data['评分'][i].toFixed(2)])
+
+                    var option = {
+                        backgroundColor: '#F9F9F9',
+                        title: {
+                            left: 'center',
+                            text: name + '电影评论情感得分随时间变化分布',
+                        },
+                        tooltip: {
+                            trigger: 'axis',
+                            axisPointer: {
+                                type: 'shadow'
+                            }
+                        },
+                        grid: {
+                            left: '0%',
+                            right: '0%',
+                            bottom: '0%',
+                            containLabel: true
+                        },
+                        xAxis: {
+                            type: 'value',
+                        },
+                        yAxis: {
+                            name: '评分(0-1)',
+                            "axisLabel": {
+                                interval: 0
+                            }
+                        },
+                        series: [
+                            {
+                                type: 'scatter',
+                                itemStyle: {
+                                    color: '#19CAAD'
+                                },
+                                data: salary
+                            }
+                        ]
+                    };
+
+                    if (option && typeof option === "object") {
+                        myChart.setOption(option, true);
+                    }
+
+                    echartsCloud();//初始化echarts图
+
+                    function echartsCloud() {
+                        // 基于准备好的dom，初始化echarts实例
+                        var myChart = echarts.init(document.getElementById('main2'));
+
+                        myChart.setOption({
+                            title: {
+                                text: name + '历年评论词云',
+                            },
+                            tooltip: {},
+                            grid: {
+                                left: '3%',
+                                right: '3%',
+                                bottom: '3%',
+                                containLabel: true
+                            },
+                            series: [{
+                                type: 'wordCloud',  //类型为字符云
+                                shape: 'ellipse',  //平滑 椭圆:ellipse 圆形:circle
+                                gridSize: 2,    //网格尺寸
+                                size: ['100%', '100%'],
+                                sizeRange: [10, 100],
+                                rotationRange: [46, 80], //旋转范围
+                                textStyle: {
+                                    normal: {
+                                        fontFamily: 'sans-serif',
+                                        color: function () {
+                                            return 'rgb('
+                                                + [Math.round(Math.random() * 160),
+                                                    Math.round(Math.random() * 160),
+                                                    Math.round(Math.random() * 160)
+                                                ].join(',') + ')';
+                                        }
+                                    },
+                                    emphasis: {
+                                        shadowBlur: 5,       //阴影距离
+                                        shadowColor: '#333'  //阴影颜色
+                                    }
+                                },
+                                data: data['词云数据'],
+                            }]
+                        });
+                        $(window).resize(function () {
+                            myChart.resize();
+                        });
+                    }
+
+                }
+            );
+        });
+    });
+
+</script>
+
+<div class="" style="margin-left: 120px; margin-right: 80px;">
+    <h3 class="page-header">电影影评与情感分析</h3>
+    <div class="row">
+        <div class="col-lg-8">
+            <div class="row control-group" style="font-size: 16px;">
+                <div class="col-xs-5">
+                    <input type="text" class="form-control" placeholder="肖申克的救赎" id="name">
+                </div>
+                <div class="col-xs-1">
+                    <button class="btn btn-success" style="font-size: 16px;" id="submit"><b>检索</b></button>
+                </div>
+                <div class="col-lg-5" style="padding-top: 5px;">
+                    <span id="info" style="font-size: 18px; color: red; margin-left: 15px;"></span>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <div class="row" style="margin-top: 20px;">
+        <div class="col-xs-9">
+            <h3><span id="电影名称"></span> <span id="豆瓣评分" style="color: red; margin-left: 8px;"></span></h3>
+            <h5 id="电影标签"></h5>
+            <h5 id="电影演员"></h5>
+            <p id="电影简介" style="font-size: 15px;"></p>
+        </div>
+        <div class="col-sm-3" id="电影海报">
+        </div>
+    </div>
+    <div class="row" id="echarts_content0">
+        <div class="col-xs-12 placeholder" style="height:400px;" id="main0"></div>
+    </div>
+    <h3 id="预测情感评分" style="color: #c7254e"></h3>
+    <div class="row placeholders" style="margin-top: 20px;" id="echarts_content">
+        <div class="col-xs-6 placeholder" style="height:600px;" id="main1"></div>
+        <div class="col-xs-6 placeholder" style="height:600px;" id="main2"></div>
+    </div>
+</div>
+
+{% endblock %}

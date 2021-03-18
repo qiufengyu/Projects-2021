@@ -1,0 +1,101 @@
+{% extends "web_analysis/base.html" %}
+
+{% block tab2 %}
+    <li class="nav-item">
+        <a class="nav-link active" role="tab" href="{% url 'wordcloud' %}" aria-selected="true">
+            <span class="d-sm-block d-none">用户搜索关键词分析</span>
+        </a>
+    </li>
+{% endblock %}
+
+{% block content %}
+    <div class="wordcloud-selector">
+        <div class="row">
+            <div class="col-md-8 mb-1">
+                <form action="{% url 'wordcloud' %}" method="post">
+                    {% csrf_token %}
+                    <div class="input-group">
+                        <input type="text" class="form-control" placeholder="用户原始ID (Initial ID)" name="uiid">
+                        <div class="input-group-append">
+                            <button class="btn btn-primary" type="submit"> 用户搜索关键词分析 </button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-6">
+            {% if error_message %}
+                <p class="word-cloud-error-message"> {{ error_message }}</p>
+            {% elif wc_data and uiid %}
+                <h5 style="padding: 0.5rem 1rem">用户 {{ uiid }} 搜索关键词词云 </h5>
+                <div style="width:650px; height:500px" id="myChart"></div>
+            {% endif %}
+        </div>
+        <div class="col-6">
+        {% if wordcount %}
+            <table class="table table-striped mb-0">
+            <thead class="thead-dark">
+            <tr>
+                <th>关键词</th>
+                <th>搜索次数</th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for wc in wordcount %}
+                <tr>
+                    <td class="text-bold-500">{{ wc.word }}</td>
+                    <td>{{ wc.count }}</td>
+                </tr>
+            {% empty %}
+                <tr>
+                    <td class="text-bold-500"></td>
+                    <td></td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+        {% endif %}
+        </div>
+    </div>
+{% endblock %}
+
+{% block canvas %}
+<script>
+    const chart = echarts.init(document.getElementById('myChart'));
+    chart.setOption({
+        series: [{
+            type: 'wordCloud',
+            shape: 'pentagon',
+            left: 'center',
+            width: '95%',
+            height: '95%',
+            sizeRange: [24, 96],
+            rotationRange: [-90, 90],
+            rotationStep: 30,
+            gridSize: 8,
+            drawOutOfBound: false,
+            layoutAnimation: true,
+            textStyle: {
+                fontFamily: 'sans-serif',
+                fontWeight: 'bold',
+                color: function () {
+                    return 'rgb(' + [
+                        Math.round(Math.random() * 160),
+                        Math.round(Math.random() * 160),
+                        Math.round(Math.random() * 160)
+                    ].join(',') + ')';
+                }
+            },
+            emphasis: {
+                textStyle: {
+                    shadowBlur: 10,
+                    shadowColor: '#333'
+                }
+            },
+            data: {{ wc_data | safe }}
+        }]
+    });
+</script>
+{% endblock %}
