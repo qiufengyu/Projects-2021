@@ -13,3 +13,6 @@
 
 ### 4. [Sougou 用户搜索数据行为分析](./sougou-search-data-analysis)
 分析用户搜索相关数据：搜索次数、关键词、时间、点击 URL、找搜索关键词的用户 + 简单用户注册登录功能 + Django
+
+### 5. [LSTM 模型股价预测](./lstm-stock-price-prediction)
+【非本人项目，帮忙调试】tushare 接口获取历史股价信息，通过 LSTM 训练预测模型 + Flask
