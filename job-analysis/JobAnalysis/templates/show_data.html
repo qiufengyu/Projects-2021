@@ -1,0 +1,55 @@
+{% extends "layout.html" %}
+
+{% block content %}
+<script src="../static/js/jquery.min.js" type="text/javascript" charset='utf-8'></script>
+<script src="../static/js/echarts.js" charset='utf-8'></script>
+
+<script type="text/javascript">
+    // 初始化界面
+    $(function () {
+
+        $('#li_1').attr('class', 'active');
+        $('#li_2').attr('class', '');
+        $('#li_3').attr('class', '');
+        $('#li_4').attr('class', '');
+        $('#li_5').attr('class', '');
+        $('#li_6').attr('class', '');
+
+        $.get('/query_spidered_data', {},
+            function (data) {
+                console.log(data);
+                data.forEach((job, index) => {
+                    $('#items').append('<tr><td>' + job[0] + '</td><td>' + job[1] + '</td><td>' + job[2] + '</td><td>' + job[3] + '</td><td>' + job[4] + '</td><td>' + job[5] + '</td><td>' + job[6] + '</td><td>' + job[7] + '</td><td>' + job[8] + '</td></tr>')
+                });
+            }
+        );
+    });
+</script>
+
+<div class="container">
+    <!--右边展示-->
+    <h3 class="page-header">爬取的全国各大行业招聘岗位信息展示（部分样例数据）</h3>
+    <div class="row">
+        <div class="col-lg-12">
+            <table class="table table-striped table-hover" style="margin-top: 20px; font-size: 15px" align="left">
+                <thead>
+                <tr>
+                    <th style="width: 22%;">岗位名称</th>
+                    <th style="width: 12%;">所属行业</th>
+                    <th style="width: 12%;">公司</th>
+                    <th style="width: 6%;">地点</th>
+                    <th style="width: 8%;">薪资</th>
+                    <th style="width: 10%;">工作经验要求</th>
+                    <th style="width: 8%;">学历要求</th>
+                    <th style="width: 6%;">人数</th>
+                    <th style="width: 8%;">发布时间</th>
+                </tr>
+                </thead>
+                <tbody id="items">
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

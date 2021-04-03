@@ -1,0 +1,93 @@
+{% extends "layout.html" %}
+
+{% block content %}
+<script src="../static/js/jquery.min.js" type="text/javascript" charset='utf-8'></script>
+<script src="../static/js/echarts.js" charset='utf-8'></script>
+<script src="../static/js/echarts-wordcloud.min.js" type="text/javascript" charset='utf-8'></script>
+
+<script type="text/javascript">
+    // 初始化界面
+    $(function () {
+
+        $('#li_1').attr('class', '');
+        $('#li_2').attr('class', '');
+        $('#li_3').attr('class', '');
+        $('#li_4').attr('class', '');
+        $('#li_5').attr('class', 'active');
+        $('#li_6').attr('class', '');
+
+        $('#myTab').find("li").each(function () {
+            $(this).click(function () {
+                $('#echarts_content').empty();
+                const key = $(this).text();
+
+                $('#echarts_content').append(
+                    '<div class="col-xs-12 placeholder" style="height:600px;" id="main"></div>'
+                );
+
+                $.get('http://127.0.0.1:5000/word_cloud/' + key, {},
+                    function (data) {
+                        echartsCloud();//初始化echarts图
+
+                        function echartsCloud() {
+                            // 基于准备好的dom，初始化echarts实例
+                            var myChart = echarts.init(document.getElementById('main'));
+
+                            myChart.setOption({
+                                tooltip: {},
+                                series: [{
+                                    type: 'wordCloud',  //类型为字符云
+                                    shape: 'smooth',  //平滑 椭圆:ellipse 圆形:circle
+                                    gridSize: 2,    //网格尺寸
+                                    size: ['100%', '100%'],
+                                    sizeRange: [10, 100],
+                                    rotationRange: [0, 40], //旋转范围
+                                    textStyle: {
+                                        normal: {
+                                            fontFamily: 'sans-serif',
+                                            color: function () {
+                                                return 'rgb('
+                                                    + [Math.round(Math.random() * 160),
+                                                        Math.round(Math.random() * 160),
+                                                        Math.round(Math.random() * 160)
+                                                    ].join(',') + ')';
+                                            }
+                                        },
+                                        emphasis: {
+                                            shadowBlur: 5,       //阴影距离
+                                            shadowColor: '#333'  //阴影颜色
+                                        }
+                                    },
+                                    data: data['词云数据'],
+                                }]
+                            });
+                            $(window).resize(function () {
+                                myChart.resize();
+                            });
+                        }
+                    }
+                );
+
+            })
+        });
+    });
+</script>
+
+<div class="">
+    <h3 class="page-header" style="margin-left: 220px;">热招岗位词云分析</h3>
+    <ul id="myTab" class="nav nav-tabs" style="font-size: 20px; margin-left: 220px;">
+        <li class="active"><a id="华东" data-toggle="tab"><b>华东</b></a></li>
+        <li><a id="华北" data-toggle="tab"><b>华北</b></a></li>
+        <li><a id="华中" data-toggle="tab"><b>华中</b></a></li>
+        <li><a id="华南" data-toggle="tab"><b>华南</b></a></li>
+        <li><a id="西南" data-toggle="tab"><b>西南</b></a></li>
+        <li><a id="西北" data-toggle="tab"><b>西北</b></a></li>
+        <li><a id="东北" data-toggle="tab"><b>东北</b></a></li>
+    </ul>
+    <div class="" id="echarts_content" style="margin-top: -20px;">
+        <div class="col-xs-12 placeholder" style="height:300px;" id="main"></div>
+    </div>
+
+</div>
+
+{% endblock %}

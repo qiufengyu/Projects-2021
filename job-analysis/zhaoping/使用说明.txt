@@ -1,0 +1,5 @@
+pycharm打开该项目工程，打开下方的 terminal 终端
+
+输入命令安装scrapy包： pip install scrapy
+
+运行爬虫：scrapy crawl job51

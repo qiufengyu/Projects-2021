@@ -16,3 +16,6 @@
 
 ### 5. [LSTM 模型股价预测](./lstm-stock-price-prediction)
 【非本人项目，帮忙调试】tushare 接口获取历史股价信息，通过 LSTM 训练预测模型 + Flask
+
+### 6. [招聘网站数据可视化分析系统](./job-analysis)
+【非本人项目，帮忙调试】51job 招聘信息获取，可视化数据与简单的统计分析，Scrapy + Flask

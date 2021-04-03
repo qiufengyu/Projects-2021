@@ -1,0 +1,243 @@
+{% extends "layout.html" %}
+
+{% block content %}
+<script src="../static/js/jquery.min.js" type="text/javascript" charset='utf-8'></script>
+<script src="../static/js/echarts.js" charset='utf-8'></script>
+
+<script type="text/javascript">
+    $(function () {
+        $('#li_1').attr('class', '');
+        $('#li_2').attr('class', '');
+        $('#li_3').attr('class', 'active');
+        $('#li_4').attr('class', '');
+        $('#li_5').attr('class', '');
+        $('#li_6').attr('class', '');
+
+        $.get('http://127.0.0.1:5000/query_yingpin_yaoqiu', {},
+            function (data) {
+                // 基于准备好的dom，初始化echarts实例
+                var dom = document.getElementById("main1");
+                var myChart = echarts.init(dom);
+
+                var series_data = [];
+                for (var i = 0; i < data['经验'].length; i++) {
+                    series_data.push({value: data['经验岗位数'][i], name: data['经验'][i]})
+                }
+                console.log(series_data);
+
+                var option = {
+                    title: {
+                        left: 'center',
+                        text: '不同工作经验的岗位数分布情况',
+                    },
+                    tooltip: {
+                        trigger: 'item',
+                        formatter: '{a} <br/>{b} : {c} ({d}%)'
+                    },
+                    series: [
+                        {
+                            name: '岗位数',
+                            type: 'pie',
+                            radius: '55%',
+                            center: ['50%', '50%'],
+                            data: series_data,
+                            emphasis: {
+                                itemStyle: {
+                                    shadowBlur: 10,
+                                    shadowOffsetX: 0,
+                                    shadowColor: 'rgba(0, 0, 0, 0.5)'
+                                }
+                            }
+                        }
+                    ]
+                };
+
+                if (option && typeof option === "object") {
+                    myChart.setOption(option, true);
+                }
+
+                var dom = document.getElementById("main2");
+                var myChart = echarts.init(dom);
+
+                var high_salary = [];
+                for (var i = 0; i < data['经验平均薪资'].length; i++)
+                    high_salary.push(data['经验平均薪资'][i].toFixed(2))
+
+                var option = {
+                    title: {
+                        left: 'left',
+                        text: '不同工作经验的岗位平均薪资分布情况',
+                    },
+                    tooltip: {
+                        trigger: 'axis'
+                    },
+                    toolbox: {
+                        show: true,
+                        feature: {
+                            dataZoom: {
+                                yAxisIndex: 'none'
+                            },
+                            dataView: {readOnly: false},
+                            magicType: {type: ['line', 'bar']},
+                            restore: {},
+                            saveAsImage: {}
+                        }
+                    },
+                    xAxis: {
+                        type: 'category',
+                        boundaryGap: false,
+                        data: data['经验']
+                    },
+                    yAxis: {
+                        type: 'value',
+                        axisLabel: {
+                            formatter: '{value} 元'
+                        }
+                    },
+                    series: {
+                        name: '最高薪资',
+                        type: 'line',
+                        data: high_salary,
+                        markPoint: {
+                            data: [
+                                {type: 'max', name: '最大值'},
+                                {type: 'min', name: '最小值'}
+                            ]
+                        },
+                        markLine: {
+                            data: [
+                                {type: 'average', name: '平均值'}
+                            ]
+                        }
+                    },
+                };
+
+                if (option && typeof option === "object") {
+                    myChart.setOption(option, true);
+                }
+
+                var dom = document.getElementById("main3");
+                var myChart = echarts.init(dom);
+
+                var series_data = [];
+                for (var i = 0; i < data['学历'].length; i++) {
+                    series_data.push({value: data['学历岗位数'][i], name: data['学历'][i]})
+                }
+
+                var option = {
+                    title: {
+                        left: 'center',
+                        text: '不同学历的岗位数分布情况',
+                    },
+                    tooltip: {
+                        trigger: 'item',
+                        formatter: '{a} <br/>{b} : {c} ({d}%)'
+                    },
+                    series: [
+                        {
+                            name: '岗位数',
+                            type: 'pie',
+                            radius: '55%',
+                            center: ['50%', '50%'],
+                            data: series_data,
+                            emphasis: {
+                                itemStyle: {
+                                    shadowBlur: 10,
+                                    shadowOffsetX: 0,
+                                    shadowColor: 'rgba(0, 0, 0, 0.5)'
+                                }
+                            }
+                        }
+                    ]
+                };
+
+                if (option && typeof option === "object") {
+                    myChart.setOption(option, true);
+                }
+
+                var dom = document.getElementById("main4");
+                var myChart = echarts.init(dom);
+
+                var high_salary = [];
+                for (var i = 0; i < data['学历平均薪资'].length; i++)
+                    high_salary.push(data['学历平均薪资'][i].toFixed(2))
+
+                var option = {
+                    title: {
+                        left: 'left',
+                        text: '不同学历的岗位平均薪资分布情况',
+                    },
+                    tooltip: {
+                        trigger: 'axis'
+                    },
+                    toolbox: {
+                        show: true,
+                        feature: {
+                            dataZoom: {
+                                yAxisIndex: 'none'
+                            },
+                            dataView: {readOnly: false},
+                            magicType: {type: ['line', 'bar']},
+                            restore: {},
+                            saveAsImage: {}
+                        }
+                    },
+                    xAxis: {
+                        type: 'category',
+                        boundaryGap: false,
+                        data: data['学历']
+                    },
+                    yAxis: {
+                        type: 'value',
+                        axisLabel: {
+                            formatter: '{value} 元'
+                        }
+                    },
+                    series: {
+                        name: '最高薪资',
+                        type: 'line',
+                        data: high_salary,
+                        markPoint: {
+                            data: [
+                                {type: 'max', name: '最大值'},
+                                {type: 'min', name: '最小值'}
+                            ]
+                        },
+                        markLine: {
+                            data: [
+                                {type: 'average', name: '平均值'}
+                            ]
+                        }
+                    },
+                };
+
+                if (option && typeof option === "object") {
+                    myChart.setOption(option, true);
+                }
+            }
+        );
+
+    });
+</script>
+
+<div class="">
+    <!--右边展示-->
+    <h3 class="page-header" style="margin-left: 220px;">不同工作经验的岗位数与平均薪资的分布情况</h3>
+    <div class="container" id="echarts_content" style="margin-top: 20px;">
+        <div class="row placeholders">
+            <div class="col-xs-6 placeholder" style="height:600px;" id="main1"></div>
+            <div class="col-xs-6 placeholder" style="height:600px;" id="main2"></div>
+        </div>
+    </div>
+
+    <h3 class="page-header" style="margin-left: 220px; margin-top: -20px;">不同学历的岗位数与平均薪资的分布情况</h3>
+    <div class="container" id="echarts_content2" style="margin-top: 20px;">
+        <div class="row placeholders">
+            <div class="col-xs-6 placeholder" style="height:500px;" id="main3"></div>
+            <div class="col-xs-6 placeholder" style="height:500px;" id="main4"></div>
+        </div>
+    </div>
+
+</div>
+
+{% endblock %}

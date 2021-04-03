@@ -1,0 +1,336 @@
+{% extends "layout.html" %}
+
+{% block content %}
+<script src="../static/js/jquery.min.js" type="text/javascript" charset='utf-8'></script>
+<script src="../static/js/echarts.js" charset='utf-8'></script>
+
+<script type="text/javascript">
+    // 初始化界面
+    $(function () {
+        $.ajaxSetup({async: false});
+
+        $('#li_1').attr('class', '');
+        $('#li_2').attr('class', '');
+        $('#li_3').attr('class', '');
+        $('#li_4').attr('class', '');
+        $('#li_5').attr('class', '');
+        $('#li_6').attr('class', 'active');
+
+        $('#myTab').find("li").each(function () {
+            $(this).click(function () {
+                $('#echarts_content2').empty();
+                const key = $(this).text();
+
+                $('#echarts_content2').append(
+                    '<div class="row placeholders">' +
+                    '<div class="col-xs-6 placeholder" style="height:550px;" id="main3"></div>' +
+                    '<div class="col-xs-6 placeholder" style="height:550px;" id="main4"></div>' +
+                    '</div>'
+                );
+
+                $.get('http://127.0.0.1:5000/dili_fengqu_analysis/' + key, {},
+                    function (data) {
+                        console.log(data);
+                        // 高薪行业
+                        $('#fengqu').text(key);
+                        $('#top_hangye').text(data['高薪行业推荐']);
+                        // 基于准备好的dom，初始化echarts实例
+                        var dom = document.getElementById("main3");
+                        var myChart = echarts.init(dom);
+
+                        var series_data = [];
+                        for (var i = 0; i < data['行业'].length; i++) {
+                            series_data.push({value: data['岗位数'][i], name: data['行业'][i]})
+                        }
+                        console.log(series_data);
+
+                        var option = {
+                            title: {
+                                left: 'center',
+                                text: key + '地区当前不同行业在招岗位数分布情况',
+                            },
+                            tooltip: {
+                                trigger: 'item',
+                                formatter: '{a} <br/>{b} : {c} ({d}%)'
+                            },
+                            series: [
+                                {
+                                    name: '岗位数',
+                                    type: 'pie',
+                                    radius: '55%',
+                                    center: ['50%', '50%'],
+                                    data: series_data,
+                                    emphasis: {
+                                        itemStyle: {
+                                            shadowBlur: 10,
+                                            shadowOffsetX: 0,
+                                            shadowColor: 'rgba(0, 0, 0, 0.5)'
+                                        }
+                                    }
+                                }
+                            ]
+                        };
+
+                        if (option && typeof option === "object") {
+                            myChart.setOption(option, true);
+                        }
+
+                        // 基于准备好的dom，初始化echarts实例
+                        var dom = document.getElementById("main4");
+                        var myChart = echarts.init(dom);
+
+                        var salary = [];
+                        for (var i = 0; i < data['平均薪资'].length; i++)
+                            salary.push(data['平均薪资'][i].toFixed(2))
+
+                        option = {
+                            title: {
+                                left: 'center',
+                                text: key + '地区不同行业的平均薪资(/元)排名分布',
+                            },
+                            tooltip: {
+                                trigger: 'axis',
+                                axisPointer: {
+                                    type: 'shadow'
+                                }
+                            },
+                            grid: {
+                                left: '3%',
+                                right: '1%',
+                                bottom: '3%',
+                                containLabel: true
+                            },
+                            xAxis: {
+                                name: '元',
+                                type: 'value',
+                                boundaryGap: [0, 0.01]
+                            },
+                            yAxis: {
+                                type: 'category',
+                                data: data['行业2'],
+                                "axisLabel": {
+                                    interval: 0
+                                }
+                            },
+                            series: [
+                                {
+                                    type: 'bar',
+                                    itemStyle: {
+                                        color: '#19CAAD'
+                                    },
+                                    data: salary
+                                }
+                            ]
+                        };
+
+                        if (option && typeof option === "object") {
+                            myChart.setOption(option, true);
+                        }
+                    }
+                );
+
+            })
+        });
+
+        $.get('/get_all_hangye', {},
+            function (results) {
+                for (var i = 0; i < results.length; i++) {
+                    $('#hangye').append('<option value="' + results[i] + '">' + results[i] + '</option>');
+                    $('#hangye2').append('<option value="' + results[i] + '">' + results[i] + '</option>');
+                }
+            }
+        );
+
+        $('#submit_predict').click(function (args) {
+            $('#items').empty();
+            var fenqu = $('#fenqu2').val();
+            var hangye = $('#hangye').val();
+            var low_salary = $('#low_salary').val();
+            var high_salary = $('#high_salary').val();
+            if ((low_salary === undefined) || (high_salary === undefined) || (low_salary === '') || (high_salary === '')) {
+                alert('请输入薪资范围！');
+                return
+            }
+
+            var params = {'fenqu': fenqu, 'hangye': hangye, 'low_salary': low_salary, 'high_salary': high_salary};
+            $.get('/recommend_jobs', params,
+                function (data) {
+                    data.forEach((job, index) => {
+                        $('#items').append('<tr><td>' + job[0] + '</td><td>' + job[1] + '</td><td>' + job[2] + '</td><td>' + job[3] + '</td><td>' + job[4] + '</td><td>' + job[5] + '</td><td>' + job[6] + '</td><td>' + job[7] + '</td><td>' + job[8] + '</td></tr>')
+                    });
+                }
+            );
+        });
+        
+        function draw_echarts(hangye_) {
+            console.log('draw:' + hangye_);
+            $.get('http://127.0.0.1:5000/hangye_fenqu_salary', {'hangye': hangye_},
+                function (data) {
+                    // 基于准备好的dom，初始化echarts实例
+                    var dom = document.getElementById("main6");
+                    var myChart = echarts.init(dom);
+                    var salary_data = []
+                    var hangyelist = []
+                    for(var i=0; i<data['平均薪资'].length; i++) {
+                        salary_data.push({value: data['平均薪资'][i].toFixed(2), name: data['分区'][i]})
+                        hangyelist.push(data['分区'][i])
+                    }
+                    var option = {
+                        tooltip: {
+                            trigger: 'item',
+                            formatter: "{a} <br/>{b} : {c}%"
+                        },
+                        toolbox: {
+                            feature: {
+                                dataView: {readOnly: false},
+                                restore: {},
+                                saveAsImage: {}
+                            }
+                        },
+                        legend: {
+                            data: data['分区']
+                        },
+
+                        series: [
+                            {
+                                name:'平均薪资',
+                                type:'funnel',
+                                left: '10%',
+                                top: 60,
+                                //x2: 80,
+                                bottom: 60,
+                                width: '80%',
+                                // height: {totalHeight} - y - y2,
+                                min: 0,
+                                max: data['最高薪资'],
+                                minSize: '0%',
+                                maxSize: '100%',
+                                sort: 'descending',
+                                gap: 2,
+                                label: {
+                                    show: true,
+                                    position: 'inside'
+                                },
+                                labelLine: {
+                                    length: 10,
+                                    lineStyle: {
+                                        width: 1,
+                                        type: 'solid'
+                                    }
+                                },
+                                itemStyle: {
+                                    borderColor: '#fff',
+                                    borderWidth: 1
+                                },
+                                emphasis: {
+                                    label: {
+                                        fontSize: 20
+                                    }
+                                },
+                                data: salary_data
+                            }
+                        ]
+                    };
+
+                    if (option && typeof option === "object") {
+                        myChart.setOption(option, true);
+                    }
+                }
+            );
+
+        }
+        function change_callback() {
+            var hy = $("#hangye2").val();
+            draw_echarts(hy);
+        }
+
+        $('#hangye2').on('change', change_callback);
+        // 获取第一个有效时间的产量等数据
+        const hy = $('#hangye2 option:first-child').val();
+        draw_echarts(hy);
+    });
+</script>
+
+<div class="">
+    <!--右边展示-->
+    <h3 class="page-header" style="margin-left: 220px;">根据划分地区的高薪行业推荐</h3>
+    <ul id="myTab" class="nav nav-tabs" style="font-size: 20px; margin-left: 220px;">
+        <li class="active"><a id="华东" data-toggd="mtab"><b>华东</b></a></li>
+        <li><a id="华北" data-toggle="tab"><b>华北</b></a></li>
+        <li><a id="华中" data-toggle="tab"><b>华中</b></a></li>
+        <li><a id="华南" data-toggle="tab"><b>华南</b></a></li>
+        <li><a id="西南" data-toggle="tab"><b>西南</b></a></li>
+        <li><a id="西北" data-toggle="tab"><b>西北</b></a></li>
+        <li><a id="东北" data-toggle="tab"><b>东北</b></a></li>
+    </ul>
+
+    <h3 style="font-size: 20px; margin-left: 225px; margin-top: 30px;">
+        <span id="fenqu" style="color: red"></span>地区推荐的高薪行业是：<span id="top_hangye" style="color: red"></span>
+    </h3>
+
+    <div class="" id="echarts_content2" style="margin-top: 20px;">
+        <div class="col-xs-6 placeholder" style="height:550px;" id="main3"></div>
+        <div class="col-xs-6 placeholder" style="height:550px;" id="main4"></div>
+    </div>
+
+    <h3 class="page-header" style="margin-left: 220px;">高薪岗位推荐</h3>
+    <div class="row" style="margin-left: 200px;">
+        <div class="col-sm-10" style="font-size: 20px; margin-bottom: 20px;">
+            <span>选择工作地区：</span>
+            <select class="combobox" id="fenqu2" style="margin-left: 10px; margin-right: 20px;">
+                <option value="华东">华东</option>
+                <option value="华北">华北</option>
+                <option value="华中">华中</option>
+                <option value="华南">华南</option>
+                <option value="西南">西南</option>
+                <option value="西北">西北</option>
+                <option value="东北">东北</option>
+            </select>
+
+            <span>选择行业：</span>
+            <select class="combobox" id="hangye" style="margin-left: 10px; margin-right: 20px;">
+            </select>
+
+            <span>薪资范围：</span>
+            <input id="low_salary" style="width: 80px; height: 30px;" placeholder="10000"/> -
+            <input id="high_salary" style="width: 80px; height: 30px;" placeholder="20000"/>
+
+            <button class="btn btn-success" id="submit_predict" style="margin-left: 20px;">岗位检索推荐</button>
+        </div>
+    </div>
+    <div class="container" id="echarts_content3" style="margin-top: 20px;">
+        <div class="row" style="height:550px;" id="main5">
+            <table class="table table-striped table-hover" style="margin-top: 20px; font-size: 15px" align="left">
+                <thead>
+                <tr>
+                    <th style="width: 22%;">岗位名称</th>
+                    <th style="width: 12%;">所属行业</th>
+                    <th style="width: 12%;">公司</th>
+                    <th style="width: 6%;">地点</th>
+                    <th style="width: 8%;">薪资</th>
+                    <th style="width: 10%;">工作经验要求</th>
+                    <th style="width: 8%;">学历要求</th>
+                    <th style="width: 6%;">人数</th>
+                    <th style="width: 8%;">发布时间</th>
+                </tr>
+                </thead>
+                <tbody id="items">
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <h3 class="page-header" style="margin-left: 220px;">不同行业高薪结业地区推荐</h3>
+    <div class="row" style="margin-left: 200px;">
+        <div class="col-sm-10" style="font-size: 20px; margin-bottom: 20px;">
+            <span>选择行业：</span>
+            <select class="combobox" id="hangye2" style="margin-left: 10px; margin-right: 20px;">
+            </select>
+        </div>
+    </div>
+    <div class="container" id="echarts_content2" style="margin-top: 20px;">
+        <div class="col-xs-12 placeholder" style="height:550px;" id="main6"></div>
+    </div>
+
+</div>
+
+{% endblock %}
