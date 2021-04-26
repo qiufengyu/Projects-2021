@@ -4,6 +4,7 @@ from snownlp import SnowNLP
 
 from utils.database import DatabaseConnector
 from utils.spider import validKeywords
+import re
 
 dbUtil = DatabaseConnector(user='root', password='+sknLv5T')
 
@@ -31,6 +32,15 @@ def detail(request, id):
     newsItem = dbUtil.getById(tid)
     if newsItem:
         newsItem['summary'] = '。'.join(newsItem['summary'])
+        all_text = ''.join(newsItem['content'])
+        lead3_summary = []
+        for x in re.split('。|，|！|？| | ', all_text):
+            if len(x) > 5 and len(lead3_summary) < 3:
+                lead3_summary.append(x)
+            elif len(lead3_summary) >= 3:
+                break
+        newsItem['lead3Summary'] = '。'.join(lead3_summary)
+        newsItem['kwList'] = newsItem['keywords'].split(',')
         return render(request, 'app/detail.html', context={'item': newsItem})
     return render(request, 'app/detail.html')
 
@@ -45,11 +55,22 @@ def generate(request):
         _keywords = [x for x in keywords10 if (len(x) > 1 and validKeywords(x))]
         keywords = ','.join(_keywords)
         # 生成一个三句话的摘要
-        summary = s.summary(3)
+        _summary = s.summary(3)
+        summary = '。'.join(_summary)
+        context = _content.split()
+        all_text = ''.join(context)
+        lead3_summary = []
+        for x in re.split('。|，|！|？| | ', all_text):
+            if len(x) > 5 and len(lead3_summary) < 3:
+                lead3_summary.append(x)
+            elif len(lead3_summary) >= 3:
+                break
+        lead_summary = '。'.join(lead3_summary)
         return render(request, 'app/generate.html', context={
             'inputText': _content,
             'keywords': keywords,
-            'summary': summary
+            'summary': summary,
+            'lead_summary': lead_summary
         })
     return render(request, 'app/generate.html', context={
         'inputText': None,

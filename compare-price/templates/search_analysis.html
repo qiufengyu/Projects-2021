@@ -1,0 +1,256 @@
+{% extends "layout.html" %}
+
+{% block content %}
+<script src="../static/js/jquery.min.js" type="text/javascript" charset='utf-8'></script>
+<script src="../static/js/echarts.js" charset='utf-8'></script>
+<script src="../static/js/echarts-wordcloud.min.js" type="text/javascript" charset='utf-8'></script>
+
+<script type="text/javascript">
+    // 初始化界面
+    $(function () {
+        $.get('http://127.0.0.1:5000/check_login', {},
+            function (data) {
+                console.log(data);
+                if (data['login'] === false) {
+                    window.location.href = '/'
+                } else {
+                    $('#nav_list').empty()
+                    $('#nav_list').append('<li id="li_1"><a href="/search_analysis" style="color: white"><b>电商平台比价搜索分析</b></a></li>')
+                    if (data['role'] == '管理员') {
+                        $('#nav_list').append('<li id="li_2"><a href="/user_guanli" style="color: white"><b>用户管理</b></a></li>')
+                    }
+                }
+            }
+        );
+
+        $("#submit_search").click(function () {
+            const search_input = $("#search_input").val();
+            $('#content').empty();
+            $('#echarts').empty();
+
+            $('#echarts').append(
+                    '<div class="placeholder" style="height:400px;" id="main1"></div>\n' +
+                '            <div class="placeholder" style="height:400px;" id="main2"></div>\n' +
+                '            <div class="placeholder" style="height:400px;" id="main3"></div>'
+                );
+
+            $.get('http://127.0.0.1:5000/search/' + search_input, {},
+                function (result) {
+                    var data = result['products']
+                    var prices = result['prices']
+
+                    for (var i = 0; i < data.length; i++) {
+                        var tab = '<div class="col-lg-5" style="margin-left: 5px; margin-top: 5px; height: 220px;">\n' +
+                            '            <div class="row" style="background-color: #e7e6e6">\n' +
+                            '                <div class="col-lg-8">\n' +
+                            '                    <h4 ><span>' + data[i][0] + '</span></h4>\n' +
+                            '                    <p><b>平台店铺：</b><span>' + data[i][3] + '</span></p>\n' +
+                            '                    <p><b>价格：</b>' + data[i][2] + '</p>\n' +
+                            '                    <p><b>评论人数：</b>' + data[i][4] + '</p>\n' +
+                            '                </div>\n' +
+                            '                <div class="col-lg-4">\n' +
+                            '                    <img style="width: 100%; padding-top: 10px;"\n' +
+                            '                         src="' + data[i][5] + '">\n' +
+                            '                </div>\n' +
+                            '            </div>\n' +
+                            '        </div>'
+
+                        $('#content').append(tab)
+                    }
+
+                    var dom = document.getElementById("main1");
+                    var myChart = echarts.init(dom);
+
+                    var option = {
+                        title: {
+                            left: 'center',
+                            text: '各大平台价格分布情况',
+                        },
+                        tooltip: {
+                            trigger: 'axis',
+                            axisPointer: {
+                                type: 'shadow'
+                            }
+                        },
+                        xAxis: {
+                            type: 'category',
+                            data: result['idx']
+                        },
+                        yAxis: {
+                            type: 'value'
+                        },
+                        grid: {
+                            left: '0%',
+                            right: '0%',
+                            bottom: '3%',
+                            containLabel: true
+                        },
+                        series: [{
+                            data: prices,
+                            type: 'line',
+                            symbol: 'triangle',
+                            symbolSize: 10,
+                            lineStyle: {
+                                color: '#5470C6',
+                                width: 2,
+                                type: 'dashed'
+                            },
+                            itemStyle: {
+                                borderWidth: 1,
+                                borderColor: '#EE6666',
+                                color: 'yellow'
+                            }
+                        }]
+                    };
+
+                    if (option && typeof option === "object") {
+                        myChart.setOption(option, true);
+                    }
+
+                    var dom = document.getElementById("main2");
+                    var myChart = echarts.init(dom);
+
+                    option = {
+                        title: {
+                            left: 'center',
+                            text: '各大平台评论人数分布情况',
+                        },
+                        tooltip: {
+                            trigger: 'axis',
+                            axisPointer: {
+                                type: 'shadow'
+                            }
+                        },
+                        grid: {
+                            left: '3%',
+                            right: '1%',
+                            bottom: '3%',
+                            containLabel: true
+                        },
+                        yAxis: {
+                            name: '评论人数',
+                            type: 'value',
+                        },
+                        xAxis: {
+                            type: 'category',
+                            data: result['idx'],
+                            "axisLabel": {
+                                interval: 0
+                            }
+                        },
+                        series: [
+                            {
+                                type: 'bar',
+                                itemStyle: {
+                                    color: '#19CAAD'
+                                },
+                                data: result['comments']
+                            }
+                        ]
+                    };
+
+                    if (option && typeof option === "object") {
+                        myChart.setOption(option, true);
+                    }
+
+                    echartsCloud();//初始化echarts图
+
+                    function echartsCloud() {
+                        // 基于准备好的dom，初始化echarts实例
+                        var myChart = echarts.init(document.getElementById('main3'));
+
+                        myChart.setOption({
+                            tooltip: {},
+                            title: {
+                                left: 'center',
+                                text: '各大平台店铺名称词云统计',
+                            },
+                            grid: {
+                                left: '1%',
+                                right: '1%',
+                                bottom: '1%',
+                                containLabel: true
+                            },
+                            series: [{
+                                type: 'wordCloud',  //类型为字符云
+                                shape: 'smooth',  //平滑 椭圆:ellipse 圆形:circle
+                                gridSize: 1,    //网格尺寸
+                                size: ['100%', '100%'],
+                                sizeRange: [10, 200],
+                                rotationRange: [0, 40], //旋转范围
+                                textStyle: {
+                                    normal: {
+                                        fontFamily: 'sans-serif',
+                                        color: function () {
+                                            return 'rgb('
+                                                + [Math.round(Math.random() * 160),
+                                                    Math.round(Math.random() * 160),
+                                                    Math.round(Math.random() * 160)
+                                                ].join(',') + ')';
+                                        }
+                                    },
+                                    emphasis: {
+                                        shadowBlur: 5,       //阴影距离
+                                        shadowColor: '#333'  //阴影颜色
+                                    }
+                                },
+                                data: result['wordclout_dict'],
+                            }]
+                        });
+                        $(window).resize(function () {
+                            myChart.resize();
+                        });
+                    }
+                }
+            );
+        });
+
+    });
+</script>
+
+
+<div style="margin-top: 40px; margin-left: 20px;">
+    <div class="row">
+        <div class="col-lg-3"></div>
+        <div class="col-lg-5">
+            <img style="height: 140px; width: 100%;"
+                 src="https://gimg2.baidu.com/image_search/src=http%3A%2F%2Fpic.5577.com%2Fup%2F2018-10%2F201810101150345226.jpg&refer=http%3A%2F%2Fpic.5577.com&app=2002&size=f9999,10000&q=a80&n=0&g=0n&fmt=jpeg?sec=1618406077&t=53f8a464e435435aa8d58b255064ec30"/>
+        </div>
+        <div class="col-lg-4"></div>
+    </div>
+    <div class="row" style="margin-top: 30px;">
+        <div class="col-lg-2"></div>
+        <div class="col-lg-7">
+            <div class="form-inline input-group">
+                <input name=ie type=HIDDEN value=utf-8/>
+                <input name=tn type=HIDDEN value=baidu/>
+                <span class="input-group-btn">
+                        <input id="search_input" type="text" class="form-control" placeholder="搜你想搜的" name="word"
+                               size="30" baiduSug="1" style="width:90%;">
+                    <button id="submit_search" class="btn btn-primary">搜索比价</button>
+                </span>
+            </div>
+        </div>
+
+        <div class="col-lg-3"></div>
+
+        <script charset="gbk" src="http://www.baidu.com/js/opensug.js"></script>
+        <!--JQuery JS依赖-->
+        <script src="http://cdn.static.runoob.com/libs/jquery/2.1.1/jquery.min.js"></script>
+        <!--Bootstrap JS依赖-->
+        <script src="http://cdn.static.runoob.com/libs/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+    </div>
+
+    <div class="row">
+        <div class="col-lg-8" id="content" style="margin-top: 40px;margin-right: -100px;">
+        </div>
+
+        <div class="col-lg-4" id="echarts" style="margin-top: 40px;">
+            <div class="placeholder" style="height:400px;" id="main1"></div>
+            <div class="placeholder" style="height:400px;" id="main2"></div>
+            <div class="placeholder" style="height:400px;" id="main3"></div>
+        </div>
+    </div>
+
+</div>
+{% endblock %}

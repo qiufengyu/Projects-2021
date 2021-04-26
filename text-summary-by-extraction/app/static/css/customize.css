@@ -84,3 +84,8 @@ footer.footer {
 .action-buttons > button {
     margin: auto 0.5rem;
 }
+
+[data-highlight=yes] {
+    display: inline-block;
+    background: #32a1ff;
+}

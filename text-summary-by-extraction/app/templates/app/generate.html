@@ -58,8 +58,9 @@
                 {% if keywords %}
                 <p>关键词： {{ keywords }}</p>
                 {% endif %}
-                {% if summary %}
-                <p>摘要：{{ summary }}</p>
+                {% if summary or lead_summary %}
+                <p>Text Rank 摘要：{{ summary }}。</p>
+                <p>Lead3 摘要：{{ lead_summary }}。</p>
                 {% endif %}
             </div>
         </div>

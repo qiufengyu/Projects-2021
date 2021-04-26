@@ -1,0 +1,151 @@
+{% extends "layout.html" %}
+
+{% block content %}
+<script src="../static/js/jquery.min.js" type="text/javascript" charset='utf-8'></script>
+
+<script type="text/javascript">
+    // 初始化界面
+    function xiugai(obj) {
+        const idx = $(obj).attr("value")
+
+        const name = $("#name_" + idx).text();
+        const password = $("#password_" + idx).val();
+        const role = $("#role_" + idx).val();
+        console.log(name)
+        console.log(password)
+        console.log(role)
+        $.get('http://127.0.0.1:5000/update_user/' + name + '/' + password + '/' + role, {},
+                function (data) {
+                    alert('修改成功！')
+                }
+            );
+
+    }
+
+    $(function () {
+        $('#li_1').attr('class', '');
+        $('#li_2').attr('class', '');
+
+        // 判断是否登录
+        // 判断是否登录
+        $.get('http://127.0.0.1:5000/check_login', {},
+            function (data) {
+                console.log(data);
+                if (data['login'] === false) {
+                    $('#show_login_reg').show();
+                    $('#index_img').css('height', '71%');
+                } else {
+                    $('#login_register').hide();
+                    $('#info_box').attr('class', 'col-lg-12');
+                    $('#info_box').css('font-size', '20px');
+
+                    $('#nav_list').empty()
+                    $('#nav_list').append('<li id="li_1"><a href="/search_analysis" style="color: white"><b>电商平台比价搜索分析</b></a></li>')
+                    if (data['role'] == '管理员') {
+                        $('#nav_list').append('<li id="li_2"><a href="/user_guanli" style="color: white"><b>用户管理</b></a></li>')
+                    }
+                }
+            }
+        );
+
+        $("#reg_submit").click(function () {
+            const name = $("#name").val();
+            const password = $("#password").val();
+
+            var objs = document.getElementsByName("role");
+            var role = '普通用户'
+            console.log(objs)
+            for (var i = 0; i < objs.length; i++) {
+                if (objs[i].checked) {
+                    role = objs[i].value
+                }
+            }
+
+            console.log(name);
+            console.log(password);
+
+            if ((name === undefined) || (password === undefined) || (name === '') || (password === '')) {
+                alert('字段不能为空！');
+                return
+            }
+
+            // 获取时间
+            $.get('http://127.0.0.1:5000/register/' + name + '/' + password + '/' + role, {},
+                function (data) {
+                    alert(data['info'])
+                }
+            );
+        });
+
+        $("#login_submit").click(function () {
+            const name = $("#name").val();
+            const password = $("#password").val();
+
+            var objs = document.getElementsByName("role");
+            var role = '普通用户'
+            console.log(objs)
+            for (var i = 0; i < objs.length; i++) {
+                if (objs[i].checked) {
+                    role = objs[i].value
+                }
+            }
+
+            console.log(name);
+            console.log(password);
+
+            if ((name === undefined) || (password === undefined) || (name === '') || (password === '')) {
+                alert('login_submit字段不能为空！');
+                return
+            }
+
+            // 获取时间
+            $.get('http://127.0.0.1:5000/login/' + name + '/' + password + '/' + role, {},
+                function (data) {
+                    alert(data['info']);
+                    if (data['status'] == 'ok') {
+                        window.location.href = "/"
+                    }
+                }
+            );
+        });
+
+
+        $.get('/query_all_users', {},
+            function (data) {
+
+                console.log(data);
+                data.forEach((job, index) => {
+                    $('#items').append('<tr><td>' + index + '</td><td id="name_' + index + '">' + job[0] + '</td><td><input id="password_' + index + '" value="' + job[1] + '"></td><td><input id="role_' + index + '" value="' + job[2] + '"></td><td><button onclick="xiugai(this)" class="btn btn-success" value="' + index + '">修改</button></td></tr>')
+                });
+            }
+        );
+
+
+    });
+</script>
+
+<div class="container">
+
+    <!-- Main component for a primary marketing message or call to action -->
+    <div class="row" style="margin-top: 20px;">
+        <div class="col-lg-12">
+            <h4>用户管理</h4>
+            <table class="table table-striped table-hover" style="margin-top: 20px; font-size: 15px" align="left">
+                <thead>
+                <tr>
+                    <th style="width: 10%;">序号</th>
+                    <th style="width: 20%;">用户名</th>
+                    <th style="width: 20%;">密码</th>
+                    <th style="width: 20%;">用户角色</th>
+                    <th style="width: 20%;">操作</th>
+                </tr>
+                </thead>
+                <tbody id="items">
+                </tbody>
+            </table>
+
+        </div>
+    </div>
+</div>
+
+{% endblock %}

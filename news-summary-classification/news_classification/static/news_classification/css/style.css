@@ -1,0 +1,20 @@
+.news-form {
+    padding-right: 15px;
+    padding-left: 15px;
+}
+
+.news-form .form-control {
+    font-size: 1rem;
+    color: #495057;
+    line-height: 1.6rem;
+}
+
+.result-block {
+    margin-top: 1.5rem;
+    padding-right: 15px;
+    padding-left: 15px;
+}
+
+.summary-text {
+    line-height: 1.2;
+}

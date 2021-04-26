@@ -1,0 +1,135 @@
+﻿{% extends "layout.html" %}
+
+{% block content %}
+<script src="../static/js/jquery.min.js" type="text/javascript" charset='utf-8'></script>
+
+<script type="text/javascript">
+    // 初始化界面
+    $(function () {
+        $('#li_1').attr('class', '');
+        $('#li_2').attr('class', '');
+
+        // 判断是否登录
+        // 判断是否登录
+        $.get('http://127.0.0.1:5000/check_login', {},
+            function (data) {
+                console.log(data);
+                if (data['login'] === false) {
+                    $('#show_login_reg').show();
+                    $('#index_img').css('height', '71%');
+                } else {
+                    $('#login_register').hide();
+                    $('#info_box').attr('class', 'col-lg-12');
+                    $('#info_box').css('font-size', '20px');
+
+                    $('#nav_list').empty()
+                    $('#nav_list').append('<li id="li_1"><a href="/search_analysis" style="color: white"><b>电商平台比价搜索分析</b></a></li>')
+                    if (data['role'] == '管理员') {
+                        $('#nav_list').append('<li id="li_2"><a href="/user_guanli" style="color: white"><b>用户管理</b></a></li>')
+                    }
+                }
+            }
+        );
+
+        $("#reg_submit").click(function () {
+            const name = $("#name").val();
+            const password = $("#password").val();
+
+            var objs = document.getElementsByName("role");
+            var role = '普通用户'
+            console.log(objs)
+            for (var i = 0; i < objs.length; i++) {
+                if (objs[i].checked) {
+                    role = objs[i].value
+                }
+            }
+
+            console.log(name);
+            console.log(password);
+
+            if ((name === undefined) || (password === undefined) || (name === '') || (password === '')) {
+                alert('字段不能为空！');
+                return
+            }
+
+            // 获取时间
+            $.get('http://127.0.0.1:5000/register/' + name + '/' + password + '/' + role, {},
+                function (data) {
+                    alert(data['info'])
+                }
+            );
+        });
+
+        $("#login_submit").click(function () {
+            const name = $("#name").val();
+            const password = $("#password").val();
+
+            var objs = document.getElementsByName("role");
+            var role = '普通用户'
+            console.log(objs)
+            for (var i = 0; i < objs.length; i++) {
+                if (objs[i].checked) {
+                    role = objs[i].value
+                }
+            }
+
+            console.log(name);
+            console.log(password);
+
+            if ((name === undefined) || (password === undefined) || (name === '') || (password === '')) {
+                alert('login_submit字段不能为空！');
+                return
+            }
+
+            // 获取时间
+            $.get('http://127.0.0.1:5000/login/' + name + '/' + password + '/' + role, {},
+                function (data) {
+                    alert(data['info']);
+                    if (data['status'] == 'ok') {
+                        window.location.href = "/"
+                    }
+                }
+            );
+        });
+
+    });
+</script>
+
+<div class="container">
+
+    <!-- Main component for a primary marketing message or call to action -->
+    <div class="jumbotron" id="show_login_reg">
+        <div style="height: 250px;">
+            <div class="row">
+                <div class="col-lg-6" id='info_box'>
+                    <h3>基于Python的电商商品比价软件</h3>
+                    <p style="font-size: 18px;">
+                        通过爬取网页有关数据，得到电商商品信息与价格，以作分析使用；对于数据进行分析整合；用户需要搜索数据时，只需要在站内搜索栏中输入相关的关键字，系统就会自动进行匹配，将搜索出来的信息进行自动排列展示给用户。</p>
+                </div>
+                <div class="col-lg-6" style="font-size: 18px; margin-top: 40px;" id='login_register'>
+                    <h4>注册/登录</h4>
+                    <p><span style="font-size: 18px;">用户名：</span><input id="name" style="width: 70%;" type="text">
+                    </p>
+                    <p><span style="font-size: 18px;">密&nbsp;&nbsp;&nbsp;码：</span><input id="password" type="password"
+                                                                                         style="width: 70%;"></p>
+                    <p><span style="font-size: 18px;">角&nbsp;&nbsp;&nbsp;色：</span><label><input type="radio" name="role"
+                                                                                                value="普通用户">普通用户</label><label><input
+                            type="radio" name="role" value="管理员">管理员</label></p>
+                    <p>
+                        <button class="btn btn-primary" id="reg_submit">注册&raquo;</button>
+                        <button class="btn btn-primary" id="login_submit">登录&raquo;</button>
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-sm-12">
+            <img src="https://ss0.bdstatic.com/70cFvHSh_Q1YnxGkpoWK1HF6hhy/it/u=1764428271,2111037741&fm=26&gp=0.jpg"
+                 style="width: 100%;" id="index_img">
+        </div>
+    </div>
+</div>
+
+{% endblock %}
